@@ -346,7 +346,7 @@ end
 function plot_results(time_list, avg_spin_down, avg_spin_up)
 
     plot(time_list, avg_spin_down, lw=2,label="spin down", dpi=600)
-    # plot!(time_list, avg_spin_up, lw=2, label="spin up")
+    plot!(time_list, avg_spin_up, lw=2, label="spin up")
     xlabel!("time")
     ylabel!("prob spin up/down")
     title = "Figures/spin.png"
@@ -354,15 +354,15 @@ function plot_results(time_list, avg_spin_down, avg_spin_up)
 
 end
 
-time_steps = 500
+time_steps = 1000
 end_time = 8
-num_of_simulations = 500
+num_of_simulations = 5000
 
-Γ = 10π
+Γ = 20π
 γL = 0.5
 γR = 0.5
 phase = 0
-N = 20
+N = 4
 
 @time time_list, avg_spin_down, avg_spin_up = average_simulation(N, phase, Γ, γL, γR, end_time, time_steps)
 
