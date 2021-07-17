@@ -107,12 +107,12 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
         ψ_0 = modulo(η_0_new)^2 + modulo(ξ_0_new)^2
         
         for j in 1:N-1
-            ψ_0 += (modulo(η_1_new[j])^2 + modulo(ξ_1_new[j]))^2
+            ψ_0 += (modulo(η_1_new[j])^2 + modulo(ξ_1_new[j])^2)
         end
 
         for j in 1:N-2
             for k in (j+1):N-1
-                ψ_0 += (modulo(η_2_new[j,k])^2 + modulo(ξ_2_new[j,k]))^2
+                ψ_0 += (modulo(η_2_new[j,k])^2 + modulo(ξ_2_new[j,k])^2)
             end
         end
 
@@ -120,7 +120,7 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
         ψ_1 = modulo(η_1_new[N])^2 + modulo(ξ_1_new[N])^2
 
         for j in 1:N-1
-            ψ_1 += (modulo(η_2_new[j,N])^2 + modulo(ξ_2_new[j,N]))^2
+            ψ_1 += (modulo(η_2_new[j,N])^2 + modulo(ξ_2_new[j,N])^2)
         end
 
         # Probablity for observing a click
@@ -303,13 +303,13 @@ end
 
 time_steps = 500
 end_time = 8
-num_of_simulations = 10000
+num_of_simulations = 1
 
 Γ = 10π
 γL = 0.5
 γR = 0.5
 phase = 0
-N = 10
+N = 20
 
 @time time_list, avg_spin_down, avg_spin_up = average_simulation(N, phase, Γ, γL, γR, end_time, time_steps)
 
