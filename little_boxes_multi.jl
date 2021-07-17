@@ -1,4 +1,3 @@
-using Base: Float64
 #=
 
 Little Boxes Multi
@@ -43,7 +42,7 @@ function return_total(η_0_new, ξ_0_new, η_1_new, ξ_1_new, η_2_new, ξ_2_new
 
 end
 
-function evolve(time_list, Γ, γL, γR ,h, phase, N)
+function evolve(time_list, Γ, γL, γR , dt, phase, N)
 
     #=
     Evolves one simulation from start to finish 
@@ -51,15 +50,15 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
     =#
 
     # Initial conditions
-    η_0_list::Array{Float64} = [1]
-    ξ_0_list::Array{Float64} = [0]
-    η_1_list = [zeros(1,N)]
-    ξ_1_list = [zeros(1,N)]
-    η_2_list = [zeros(N,N)]
-    ξ_2_list = [zeros(N,N)]
+    η_0_list::Array{ComplexF64} = [1]
+    ξ_0_list::Array{ComplexF64} = [0]
+    η_1_list::Array{Array{ComplexF64}} = [zeros(1,N)]
+    ξ_1_list::Array{Array{ComplexF64}} = [zeros(1,N)]
+    η_2_list::Array{Array{ComplexF64}} = [zeros(N,N)]
+    ξ_2_list::Array{Array{ComplexF64}} = [zeros(N,N)]
 
-    λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/(10*h))
-    λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/(10*h))
+    λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/(10*dt))
+    λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/(10*dt))
 
     for index in 1:size(time_list)[1]
 
@@ -74,48 +73,48 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
     
         η_0_new = 0
         ξ_0_new = 0
-        η_1_new = zeros(1,N)
-        ξ_1_new = zeros(1,N)
-        η_2_new = zeros(N,N) # η2_j,k
-        ξ_2_new = zeros(N,N) # ξ2_j,k
+        η_1_new::Array{ComplexF64} = zeros(1,N)
+        ξ_1_new::Array{ComplexF64} = zeros(1,N)
+        η_2_new::Array{ComplexF64} = zeros(N,N) # η2_j,k
+        ξ_2_new::Array{ComplexF64} = zeros(N,N) # ξ2_j,k
 
         # η0 and ξ0 coeffs update 
-        η_0_new = η_0_old +  ((-Γ/2) * ξ_0_old)*h
-        ξ_0_new = ξ_0_old + ((λL * η_1_old[1] + λR * η_1_old[N] + (Γ/2)*η_0_old)) * h 
+        η_0_new = η_0_old +  ((-Γ/2) * ξ_0_old)*dt
+        ξ_0_new = ξ_0_old + (((λL * η_1_old[1]) + (λR * η_1_old[N]) + (Γ/2)*η_0_old))*dt
 
         # η1, ξ1 coeffs update
-        η_1_new[1] = η_1_old[1] + (λL * ξ_0_old - (Γ/2)*ξ_1_old[1])*h
-        η_1_new[N] = η_1_old[N] + (λR * ξ_0_old - (Γ/2)*ξ_1_old[N])*h
+        η_1_new[1] = η_1_old[1] + ((λL * ξ_0_old) - (Γ/2)*ξ_1_old[1])*dt
+        η_1_new[N] = η_1_old[N] + ((λR * ξ_0_old) - (Γ/2)*ξ_1_old[N])*dt
 
         for j in 2:N-1
-            η_1_new[j] = η_1_old[j] + ((-Γ/2) * ξ_1_old[j])*h
+            η_1_new[j] = η_1_old[j] + ((-Γ/2) * ξ_1_old[j])*dt
         end
  
-        ξ_1_new[1] = ξ_1_old[1] + (λR * η_2_old[1,1] + (Γ/2)*η_1_old[1])*h
-        ξ_1_new[N] = ξ_1_old[N] + (λL * η_2_old[1,N] + (Γ/2)*η_1_old[N])*h
+        ξ_1_new[1] = ξ_1_old[1] + ((λR * η_2_old[1,1]) + (Γ/2)*η_1_old[1])*dt
+        ξ_1_new[N] = ξ_1_old[N] + ((λL * η_2_old[1,N]) + (Γ/2)*η_1_old[N])*dt
 
         for j in 2:N-1
-            ξ_1_new[j] = ξ_1_old[j] + (λL*η_2_old[j,1] + λR*η_2_old[j,N] + (Γ/2)*η_1_old[j])*h
+            ξ_1_new[j] = ξ_1_old[j] + ((λL*η_2_old[j,1]) + (λR*η_2_old[j,N]) + (Γ/2)*η_1_old[j])*dt
         end
 
         # η2, ξ2 coeffs update
         for j in 2:N
-            η_2_new[j,1] = η_2_old[j,1] + (λL*ξ_1_old[j] - (Γ/2)*ξ_2_old[j,1])*h
+            η_2_new[j,1] = η_2_old[j,1] + ((λL*ξ_1_old[j]) - (Γ/2)*ξ_2_old[j,1])*dt
         end
 
         for j in 1:N-1
-            η_2_new[j,N] = η_2_old[j,N] + (λR*ξ_1_old[j] - (Γ/2)*ξ_2_old[j,N])*h
+            η_2_new[j,N] = η_2_old[j,N] + ((λR*ξ_1_old[j]) - (Γ/2)*ξ_2_old[j,N])*dt
         end
 
         for j in 1:N-2
             for k in (j+1):N-1
-                η_2_new[j,k] = η_2_old[j,k] + ((-Γ/2)*ξ_2_old[j,k])*h
+                η_2_new[j,k] = η_2_old[j,k] + ((-Γ/2)*ξ_2_old[j,k])*dt
             end
         end
 
         for j in 1:N-1
             for k in (j+1):N
-                ξ_2_new[j,k] = ξ_2_old[j,k] + ((Γ/2)*η_2_old[j,k])*h
+                ξ_2_new[j,k] = ξ_2_old[j,k] + ((Γ/2)*η_2_old[j,k])*dt
             end
         end
 
@@ -164,8 +163,8 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
                 η_0 = η_1_new[N]
                 ξ_0 = ξ_1_new[N]
 
-                η_1 = zeros(1,N)
-                ξ_1 = zeros(1,N)
+                η_1::Array{ComplexF64} = zeros(1,N)
+                ξ_1::Array{ComplexF64} = zeros(1,N)
 
                 η_1[1] = 0
                 ξ_1[1] = 0
@@ -175,8 +174,8 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
                     ξ_1[j] = ξ_2_new[j-1,N]
                 end
 
-                η_2 = zeros(N,N) # η2_j,k
-                ξ_2 = zeros(N,N) # ξ2_j,k
+                η_2::Array{ComplexF64} = zeros(N,N) # η2_j,k
+                ξ_2::Array{ComplexF64} = zeros(N,N) # ξ2_j,k
 
                 total = return_total(η_0, ξ_0, η_1, ξ_1, η_2, ξ_2)
                 η_0 /= total 
@@ -200,7 +199,7 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
                 ξ_0 = ξ_0_new 
 
                 η_1 = zeros(1,N)
-                ξ_1 = zeros(1,N)
+                ξ_1= zeros(1,N)
 
                 η_1[1] = 0
                 ξ_1[1] = 0
@@ -281,14 +280,14 @@ end
 function average_simulation(N, phase, Γ, γL, γR, end_time, time_steps)
 
     time_list = LinRange(0,end_time,time_steps)
-    h = end_time/time_steps
+    dt = end_time/time_steps
 
     avg_spin_up = zeros(size(time_list)[1])
     avg_spin_down= zeros(size(time_list)[1])
 
     for sim in 1:num_of_simulations
 
-        η_0_list, ξ_0_list, η_1_list, ξ_1_list, η_2_list, ξ_2_list = evolve(time_list, Γ, γL, γR, h, phase, N)
+        η_0_list, ξ_0_list, η_1_list, ξ_1_list, η_2_list, ξ_2_list = evolve(time_list, Γ, γL, γR, dt, phase, N)
 
         spin_up_prob = zeros(size(time_list)[1])
         spin_down_prob = zeros(size(time_list)[1])
@@ -296,28 +295,28 @@ function average_simulation(N, phase, Γ, γL, γR, end_time, time_steps)
         for i in 1:size(time_list)[1]
 
             # Calculates total spin down probability 
-            spin_down_prob[i] += modulo(η_0_list[i])
+            spin_down_prob[i] += modulo(η_0_list[i])^2
 
             for j in 1:N
-                spin_down_prob[i] += modulo(η_1_list[i][j])
+                spin_down_prob[i] += modulo(η_1_list[i][j])^2
             end
 
             for j in 1:N
                 for k in 1:N
-                    spin_down_prob[i] += modulo(η_2_list[i][j,k])
+                    spin_down_prob[i] += modulo(η_2_list[i][j,k])^2
                 end
             end
 
             # Calculates total spin up probability 
-            spin_up_prob[i] += modulo(ξ_0_list[i])
+            spin_up_prob[i] += modulo(ξ_0_list[i])^2
 
             for j in 1:N
-                spin_up_prob[i] += modulo(ξ_1_list[i][j])
+                spin_up_prob[i] += modulo(ξ_1_list[i][j])^2
             end
 
             for j in 1:N
                 for k in 1:N
-                    spin_up_prob[i] += modulo(ξ_2_list[i][j,k])
+                    spin_up_prob[i] += modulo(ξ_2_list[i][j,k])^2
                 end
             end
 
