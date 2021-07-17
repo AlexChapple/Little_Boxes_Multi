@@ -25,6 +25,24 @@ function modulo(z)
     return sqrt(real(z)^2 + imag(z)^2)
 end
 
+function return_total(η_0_new, ξ_0_new, η_1_new, ξ_1_new, η_2_new, ξ_2_new)
+
+    total = modulo(η_0_new) + modulo(ξ_0_new)
+
+    for i in 1:N
+        total += (modulo(η_1_new[i]) + modulo(ξ_1_new[i]))
+    end
+
+    for j in 1:N
+        for k in 1:N
+            total += (modulo(η_2_new[j,k]) + modulo(ξ_2_new[j,k]))
+        end
+    end
+
+    return total 
+
+end
+
 function evolve(time_list, Γ, γL, γR ,h, phase, N)
 
     #=
@@ -103,45 +121,37 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
 
         # Normalise everything here
 
-        total = modulo(η_0_new)^2 + modulo(ξ_0_new)^2
-
-        for i in 1:N
-            total += (modulo(η_1_new[i])^2 + modulo(ξ_1_new[i])^2)
-        end
-
-        for j in 1:N
-            for k in 1:N
-                total += (modulo(η_2_new[j,k])^2 + modulo(ξ_2_new[j,k])^2)
-            end
-        end
+        total = return_total(η_0_new, ξ_0_new, η_1_new, ξ_1_new, η_2_new, ξ_2_new)
 
         η_0_new /= total
         ξ_0_new /= total 
         η_1_new /= total
         ξ_1_new /= total 
         η_2_new /= total
-        ξ_2_new /= total 
+        ξ_2_new /= total
+        
+        total2 = return_total(η_0_new, ξ_0_new, η_1_new, ξ_1_new, η_2_new, ξ_2_new)
 
         # Do statistics here --------------------------------------------------------------------------
 
         # Here ψ_0 = <ψ_0 | ψ_0>
-        ψ_0 = modulo(η_0_new)^2 + modulo(ξ_0_new)^2
+        ψ_0 = modulo(η_0_new) + modulo(ξ_0_new)
         
         for j in 1:N-1
-            ψ_0 += (modulo(η_1_new[j])^2 + modulo(ξ_1_new[j])^2)
+            ψ_0 += (modulo(η_1_new[j]) + modulo(ξ_1_new[j]))
         end
 
         for j in 1:N-2
             for k in (j+1):N-1
-                ψ_0 += (modulo(η_2_new[j,k])^2 + modulo(ξ_2_new[j,k])^2)
+                ψ_0 += (modulo(η_2_new[j,k]) + modulo(ξ_2_new[j,k]))
             end
         end
 
         # Here ψ_1 = <ψ_1 | ψ_1>
-        ψ_1 = modulo(η_1_new[N])^2 + modulo(ξ_1_new[N])^2
+        ψ_1 = modulo(η_1_new[N]) + modulo(ξ_1_new[N])
 
         for j in 1:N-1
-            ψ_1 += (modulo(η_2_new[j,N])^2 + modulo(ξ_2_new[j,N])^2)
+            ψ_1 += (modulo(η_2_new[j,N]) + modulo(ξ_2_new[j,N]))
         end
 
         # Probablity for observing a click
