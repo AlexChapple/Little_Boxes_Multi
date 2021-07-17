@@ -125,75 +125,79 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
 
         # Probablity for observing a click
 
-        prob = ψ_1^2 / (ψ_1^2 + ψ_0^2)
-        rand_num = rand()
+        if t % 10 == 0
 
-        if rand_num <= prob # Photon found
+            prob = ψ_1^2 / (ψ_1^2 + ψ_0^2)
+            rand_num = rand()
 
-            η_0 = η_1_new[N]
-            ξ_0 = ξ_1_new[N]
+            if rand_num <= prob # Photon found
 
-            η_1 = zeros(1,N)
-            ξ_1 = zeros(1,N)
+                η_0 = η_1_new[N]
+                ξ_0 = ξ_1_new[N]
 
-            η_1[1] = 0
-            ξ_1[1] = 0
+                η_1 = zeros(1,N)
+                ξ_1 = zeros(1,N)
 
-            for j in 2:N
-                η_1[j] = η_2_new[j-1,N]
-                ξ_1[j] = ξ_2_new[j-1,N]
-            end
+                η_1[1] = 0
+                ξ_1[1] = 0
 
-            η_2 = zeros(N,N) # η2_j,k
-            ξ_2 = zeros(N,N) # ξ2_j,k
-
-            # Update list
-            push!(η_0_list, η_0)
-            push!(ξ_0_list, ξ_0)
-            push!(η_1_list, η_1)
-            push!(ξ_1_list, ξ_1)
-            push!(η_2_list, η_2)
-            push!(ξ_2_list, ξ_2)
-
-        else # Photon not found
-
-            η_0 = η_0_new
-            ξ_0 = ξ_0_new 
-
-            η_1 = zeros(1,N)
-            ξ_1 = zeros(1,N)
-
-            η_1[1] = 0
-            ξ_1[1] = 0
-
-            for j in 2:N
-                η_1[j] = η_1_new[j-1]
-                ξ_1[j] = ξ_1_new[j-1]
-            end
-
-            η_2 = zeros(N,N) # η2_j,k
-            ξ_2 = zeros(N,N) # ξ2_j,k
-
-            for k in 2:N
-                η_2[1,k] = 0
-                ξ_2[1,k] = 0
-            end
-
-            for j in 2:N-1
-                for k in (j+1):N
-                    η_2[j,k] = η_2_new[j-1,k-1]
-                    ξ_2[j,k] = ξ_2_new[j-1,k-1]
+                for j in 2:N
+                    η_1[j] = η_2_new[j-1,N]
+                    ξ_1[j] = ξ_2_new[j-1,N]
                 end
+
+                η_2 = zeros(N,N) # η2_j,k
+                ξ_2 = zeros(N,N) # ξ2_j,k
+
+                # Update list
+                push!(η_0_list, η_0)
+                push!(ξ_0_list, ξ_0)
+                push!(η_1_list, η_1)
+                push!(ξ_1_list, ξ_1)
+                push!(η_2_list, η_2)
+                push!(ξ_2_list, ξ_2)
+
+            else # Photon not found
+
+                η_0 = η_0_new
+                ξ_0 = ξ_0_new 
+
+                η_1 = zeros(1,N)
+                ξ_1 = zeros(1,N)
+
+                η_1[1] = 0
+                ξ_1[1] = 0
+
+                for j in 2:N
+                    η_1[j] = η_1_new[j-1]
+                    ξ_1[j] = ξ_1_new[j-1]
+                end
+
+                η_2 = zeros(N,N) # η2_j,k
+                ξ_2 = zeros(N,N) # ξ2_j,k
+
+                for k in 2:N
+                    η_2[1,k] = 0
+                    ξ_2[1,k] = 0
+                end
+
+                for j in 2:N-1
+                    for k in (j+1):N
+                        η_2[j,k] = η_2_new[j-1,k-1]
+                        ξ_2[j,k] = ξ_2_new[j-1,k-1]
+                    end
+                end
+
+                # Update list
+                push!(η_0_list, η_0)
+                push!(ξ_0_list, ξ_0)
+                push!(η_1_list, η_1)
+                push!(ξ_1_list, ξ_1)
+                push!(η_2_list, η_2)
+                push!(ξ_2_list, ξ_2)
+
+
             end
-
-            # Update list
-            push!(η_0_list, η_0)
-            push!(ξ_0_list, ξ_0)
-            push!(η_1_list, η_1)
-            push!(ξ_1_list, ξ_1)
-            push!(η_2_list, η_2)
-            push!(ξ_2_list, ξ_2)
-
 
         end
 
