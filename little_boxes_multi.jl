@@ -43,7 +43,7 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
     λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/h)
     λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/h)
 
-    for t in time_list
+    for index in 1:size(time_list)[1]
 
         η_0_old = copy(η_0_list[end])
         ξ_0_old = copy(ξ_0_list[end])
@@ -101,6 +101,27 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
             end
         end
 
+        # Normalise everything here
+
+        total = modulo(η_0_new)^2 + modulo(ξ_0_new)^2
+
+        for i in 1:N
+            total += (modulo(η_1_new[i])^2 + modulo(ξ_1_new[i])^2)
+        end
+
+        for j in 1:N
+            for k in 1:N
+                total += (modulo(η_2_new[j,k])^2 + modulo(ξ_2_new[j,k])^2)
+            end
+        end
+
+        η_0_new /= total
+        ξ_0_new /= total 
+        η_1_new /= total
+        ξ_1_new /= total 
+        η_2_new /= total
+        ξ_2_new /= total 
+
         # Do statistics here --------------------------------------------------------------------------
 
         # Here ψ_0 = <ψ_0 | ψ_0>
@@ -125,7 +146,7 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
 
         # Probablity for observing a click
 
-        if t % 10 == 0
+        if index % 10 == 0
 
             prob = ψ_1 / (ψ_1 + ψ_0)
             rand_num = rand()
@@ -303,7 +324,7 @@ end
 
 time_steps = 500
 end_time = 8
-num_of_simulations = 1
+num_of_simulations = 10000
 
 Γ = 10π
 γL = 0.5
