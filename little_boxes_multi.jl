@@ -58,8 +58,8 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
     η_2_list = [zeros(N,N)]
     ξ_2_list = [zeros(N,N)]
 
-    λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/h)
-    λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/h)
+    λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/(10*h))
+    λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/(10*h))
 
     for index in 1:size(time_list)[1]
 
@@ -129,29 +129,27 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
         ξ_1_new /= total 
         η_2_new /= total
         ξ_2_new /= total
-        
-        total2 = return_total(η_0_new, ξ_0_new, η_1_new, ξ_1_new, η_2_new, ξ_2_new)
 
         # Do statistics here --------------------------------------------------------------------------
 
         # Here ψ_0 = <ψ_0 | ψ_0>
-        ψ_0 = modulo(η_0_new) + modulo(ξ_0_new)
+        ψ_0 = modulo(η_0_new)^2 + modulo(ξ_0_new)^2
         
         for j in 1:N-1
-            ψ_0 += (modulo(η_1_new[j]) + modulo(ξ_1_new[j]))
+            ψ_0 += (modulo(η_1_new[j])^2 + modulo(ξ_1_new[j]))^2
         end
 
         for j in 1:N-2
             for k in (j+1):N-1
-                ψ_0 += (modulo(η_2_new[j,k]) + modulo(ξ_2_new[j,k]))
+                ψ_0 += (modulo(η_2_new[j,k])^2 + modulo(ξ_2_new[j,k]))^2
             end
         end
 
         # Here ψ_1 = <ψ_1 | ψ_1>
-        ψ_1 = modulo(η_1_new[N]) + modulo(ξ_1_new[N])
+        ψ_1 = modulo(η_1_new[N])^2 + modulo(ξ_1_new[N])^2
 
         for j in 1:N-1
-            ψ_1 += (modulo(η_2_new[j,N]) + modulo(ξ_2_new[j,N]))
+            ψ_1 += (modulo(η_2_new[j,N])^2 + modulo(ξ_2_new[j,N]))^2
         end
 
         # Probablity for observing a click
@@ -179,6 +177,14 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
 
                 η_2 = zeros(N,N) # η2_j,k
                 ξ_2 = zeros(N,N) # ξ2_j,k
+
+                total = return_total(η_0, ξ_0, η_1, ξ_1, η_2, ξ_2)
+                η_0 /= total 
+                ξ_0 /= total 
+                η_1 /= total 
+                ξ_1 /= total 
+                η_2 /= total
+                ξ_2 /= total 
 
                 # Update list
                 push!(η_0_list, η_0)
@@ -219,6 +225,15 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
                     end
                 end
 
+                total = return_total(η_0, ξ_0, η_1, ξ_1, η_2, ξ_2)
+                η_0 /= total 
+                ξ_0 /= total 
+                η_1 /= total 
+                ξ_1 /= total 
+                η_2 /= total
+                ξ_2 /= total 
+
+
                 # Update list
                 push!(η_0_list, η_0)
                 push!(ξ_0_list, ξ_0)
@@ -238,6 +253,14 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
             ξ_1 = ξ_1_new
             η_2 = η_2_new
             ξ_2 = ξ_2_new 
+
+            total = return_total(η_0, ξ_0, η_1, ξ_1, η_2, ξ_2)
+            η_0 /= total 
+            ξ_0 /= total 
+            η_1 /= total 
+            ξ_1 /= total 
+            η_2 /= total
+            ξ_2 /= total 
 
             # Update list
             push!(η_0_list, η_0)
@@ -273,28 +296,28 @@ function average_simulation(N, phase, Γ, γL, γR, end_time, time_steps)
         for i in 1:size(time_list)[1]
 
             # Calculates total spin down probability 
-            spin_down_prob[i] += modulo(η_0_list[i])^2
+            spin_down_prob[i] += modulo(η_0_list[i])
 
             for j in 1:N
-                spin_down_prob[i] += modulo(η_1_list[i][j])^2
+                spin_down_prob[i] += modulo(η_1_list[i][j])
             end
 
             for j in 1:N
                 for k in 1:N
-                    spin_down_prob[i] += modulo(η_2_list[i][j,k])^2
+                    spin_down_prob[i] += modulo(η_2_list[i][j,k])
                 end
             end
 
             # Calculates total spin up probability 
-            spin_up_prob[i] += modulo(ξ_0_list[i])^2
+            spin_up_prob[i] += modulo(ξ_0_list[i])
 
             for j in 1:N
-                spin_up_prob[i] += modulo(ξ_1_list[i][j])^2
+                spin_up_prob[i] += modulo(ξ_1_list[i][j])
             end
 
             for j in 1:N
                 for k in 1:N
-                    spin_up_prob[i] += modulo(ξ_2_list[i][j,k])^2
+                    spin_up_prob[i] += modulo(ξ_2_list[i][j,k])
                 end
             end
 
@@ -324,7 +347,7 @@ end
 function plot_results(time_list, avg_spin_down, avg_spin_up)
 
     plot(time_list, avg_spin_down, lw=2,label="spin down", dpi=600)
-    plot!(time_list, avg_spin_up, lw=2, label="spin up")
+    # plot!(time_list, avg_spin_up, lw=2, label="spin up")
     xlabel!("time")
     ylabel!("prob spin up/down")
     title = "Figures/spin.png"
@@ -334,7 +357,7 @@ end
 
 time_steps = 500
 end_time = 8
-num_of_simulations = 10000
+num_of_simulations = 500
 
 Γ = 10π
 γL = 0.5
