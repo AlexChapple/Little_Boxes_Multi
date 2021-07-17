@@ -280,7 +280,7 @@ function plot_results(time_list, avg_spin_down, avg_spin_up)
 
 end
 
-time_steps = 500
+time_steps = 1000
 end_time = 8
 num_of_simulations = 10000
 
@@ -290,6 +290,6 @@ num_of_simulations = 10000
 phase = 0
 N = 10
 
-time_list, avg_spin_down, avg_spin_up = average_simulation(N, phase, Γ, γL, γR, end_time, time_steps)
+@time time_list, avg_spin_down, avg_spin_up = average_simulation(N, phase, Γ, γL, γR, end_time, time_steps)
 
 plot_results(time_list, avg_spin_down, avg_spin_up)
