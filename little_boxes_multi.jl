@@ -127,7 +127,7 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
 
         if t % 10 == 0
 
-            prob = ψ_1^2 / (ψ_1^2 + ψ_0^2)
+            prob = ψ_1 / (ψ_1 + ψ_0)
             rand_num = rand()
 
             if rand_num <= prob # Photon found
@@ -198,6 +198,23 @@ function evolve(time_list, Γ, γL, γR ,h, phase, N)
 
 
             end
+
+        else
+
+            η_0 = η_0_new
+            ξ_0 = ξ_0_new
+            η_1 = η_1_new
+            ξ_1 = ξ_1_new
+            η_2 = η_2_new
+            ξ_2 = ξ_2_new 
+
+            # Update list
+            push!(η_0_list, η_0)
+            push!(ξ_0_list, ξ_0)
+            push!(η_1_list, η_1)
+            push!(ξ_1_list, ξ_1)
+            push!(η_2_list, η_2)
+            push!(ξ_2_list, ξ_2)
 
         end
 
@@ -275,7 +292,7 @@ end
 
 function plot_results(time_list, avg_spin_down, avg_spin_up)
 
-    plot(time_list, avg_spin_down, lw=2,label="spin down")
+    plot(time_list, avg_spin_down, lw=2,label="spin down", dpi=600)
     plot!(time_list, avg_spin_up, lw=2, label="spin up")
     xlabel!("time")
     ylabel!("prob spin up/down")
@@ -284,7 +301,7 @@ function plot_results(time_list, avg_spin_down, avg_spin_up)
 
 end
 
-time_steps = 1000
+time_steps = 500
 end_time = 8
 num_of_simulations = 10000
 
