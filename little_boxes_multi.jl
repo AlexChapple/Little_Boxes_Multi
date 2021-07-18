@@ -363,7 +363,7 @@ end
 
 time_steps = 10000
 end_time = 8
-num_of_simulations = 1000
+num_of_simulations = 5000
 
 Γ = 10π
 γL = 0.5
