@@ -42,7 +42,7 @@ function return_total(η_0_new, ξ_0_new, η_1_new, ξ_1_new, η_2_new, ξ_2_new
 
 end
 
-function evolve(time_list, Γ, γL, γR , dt, phase, N)
+function evolve(time_list, Γ, γL, γR , dt, τ, phase, N)
 
     #=
     Evolves one simulation from start to finish 
@@ -57,8 +57,8 @@ function evolve(time_list, Γ, γL, γR , dt, phase, N)
     η_2_list::Array{Array{ComplexF64}} = [zeros(N,N)]
     ξ_2_list::Array{Array{ComplexF64}} = [zeros(N,N)]
 
-    λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/(10*dt))
-    λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/(10*dt))
+    λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/τ)
+    λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/τ)
 
     for index in 1:size(time_list)[1]
 
@@ -281,13 +281,15 @@ function average_simulation(N, phase, Γ, γL, γR, end_time, time_steps)
 
     time_list = LinRange(0,end_time,time_steps)
     dt = end_time/time_steps
+    Δt = 10 * dt
+    τ = Δt * N
 
     avg_spin_up = zeros(size(time_list)[1])
     avg_spin_down= zeros(size(time_list)[1])
 
     for sim in 1:num_of_simulations
 
-        η_0_list, ξ_0_list, η_1_list, ξ_1_list, η_2_list, ξ_2_list = evolve(time_list, Γ, γL, γR, dt, phase, N)
+        η_0_list, ξ_0_list, η_1_list, ξ_1_list, η_2_list, ξ_2_list = evolve(time_list, Γ, γL, γR, dt, τ, phase, N)
 
         spin_up_prob = zeros(size(time_list)[1])
         spin_down_prob = zeros(size(time_list)[1])
@@ -346,23 +348,28 @@ end
 function plot_results(time_list, avg_spin_down, avg_spin_up)
 
     plot(time_list, avg_spin_down, lw=2,label="spin down", dpi=600)
-    plot!(time_list, avg_spin_up, lw=2, label="spin up")
     xlabel!("time")
-    ylabel!("prob spin up/down")
-    title = "Figures/spin.png"
+    ylabel!("prob spin down")
+    title = "Figures/spin_down.png"
+    savefig(title)
+
+    plot(time_list, avg_spin_up, lw=2, label="spin up", dpi=600)
+    xlabel!("time")
+    ylabel!("prob spin up")
+    title = "Figures/spin_up.png"
     savefig(title)
 
 end
 
 time_steps = 1000
 end_time = 8
-num_of_simulations = 5000
+num_of_simulations = 500
 
-Γ = 20π
+Γ = 10π
 γL = 0.5
 γR = 0.5
 phase = 0
-N = 4
+N = 20
 
 @time time_list, avg_spin_down, avg_spin_up = average_simulation(N, phase, Γ, γL, γR, end_time, time_steps)
 
