@@ -478,9 +478,10 @@ function average_simulation(N, phase, Ω, γL, γR, end_time, time_steps)
         avg_spin_down += spin_down_prob
         avg_spin_up += spin_up_prob
 
-        if sim % 10 == 0
-            print(string(sim) * "/" * string(num_of_simulations) * " Simulations Completed.\r")
-        end
+        # if sim % 10 == 0
+        #     print(string(sim) * "/" * string(num_of_simulations) * " Simulations Completed.\r")
+        # end
+        print(string(sim) * "/" * string(num_of_simulations) * " Simulations Completed.\r")
 
     end
 
