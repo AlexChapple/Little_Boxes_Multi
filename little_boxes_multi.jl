@@ -355,14 +355,14 @@ function plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase
     xlabel!("time")
     ylabel!("prob spin down")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_down.png"
+    name = "Figures/spin_down2.png"
     savefig(name)
 
     plot(time_list, avg_spin_up, lw=2, label="spin up", dpi=600)
     xlabel!("time")
     ylabel!("prob spin up")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_up.png"
+    name = "Figures/spin_up2.png"
     savefig(name)
 
 end
