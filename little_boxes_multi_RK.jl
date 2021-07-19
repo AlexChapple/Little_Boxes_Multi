@@ -501,26 +501,26 @@ function plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase
     xlabel!("time")
     ylabel!("prob spin down")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_down_RK4.png"
+    name = "Figures/test/spin_down_RK4_test.png"
     savefig(name)
 
     plot(time_list, avg_spin_up, lw=2, label="spin up", dpi=600)
     xlabel!("time")
     ylabel!("prob spin up")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_up_RK4.png"
+    name = "Figures/test/spin_up_RK4_test.png"
     savefig(name)
 
 end
 
-time_steps = 80000
+time_steps = 10000
 end_time = 8
-num_of_simulations = 50
+num_of_simulations = 10
 
 Ω = 10π
 γL = 0.5
 γR = 0.5
-phase = π
+phase = 0
 N = 20
 
 @time time_list, avg_spin_down, avg_spin_up = average_simulation(N, phase, Ω, γL, γR, end_time, time_steps)
