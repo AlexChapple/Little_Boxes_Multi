@@ -375,6 +375,10 @@ function evolve(time_list, Ω, γL, γR , dt, τ, phase, N)
                     end
                 end
 
+                total = spin_up_prob + spin_down_prob
+                spin_up_prob /= total
+                spin_down_prob /= total
+
                 spin_down[index] = spin_down_prob
                 spin_up[index] = spin_up_prob
 
@@ -434,9 +438,12 @@ function evolve(time_list, Ω, γL, γR , dt, τ, phase, N)
                     end
                 end
 
+                total = spin_up_prob + spin_down_prob
+                spin_up_prob /= total
+                spin_down_prob /= total
+
                 spin_down[index] = spin_down_prob
                 spin_up[index] = spin_up_prob
-
 
             end
 
@@ -472,6 +479,10 @@ function evolve(time_list, Ω, γL, γR , dt, τ, phase, N)
                     spin_up_prob += modulo(ξ_2[j,k])^2
                 end
             end
+
+            total = spin_up_prob + spin_down_prob
+            spin_up_prob /= total
+            spin_down_prob /= total
 
             spin_down[index] = spin_down_prob
             spin_up[index] = spin_up_prob
@@ -537,7 +548,7 @@ end
 
 time_steps = 10000
 end_time = 8
-num_of_simulations = 100
+num_of_simulations = 10
 
 Ω = 10π
 γL = 0.5
