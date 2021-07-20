@@ -535,7 +535,7 @@ function plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase
 
 end
 
-time_steps = 80000
+time_steps = 10000
 end_time = 8
 num_of_simulations = 1
 
