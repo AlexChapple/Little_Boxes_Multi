@@ -12,6 +12,8 @@ Edits:
 19/7/2021 - Adding RK (new file)
 20/7/2021 - Optimising the code heavily by reducing the number of things that need to be stored
 
+Speed: 10 simulations with 10000 times steps 524 seconds
+
 =#
 
 # Importing Libraries 
@@ -532,7 +534,7 @@ function plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase
     xlabel!("time")
     ylabel!("prob spin down")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_down_RK4_optimised3.png"
+    name = "Figures/spin_down_RK4_optimised4.png"
     savefig(name)
 
     attributes = "spin up," * " Ω:" * string(round(Ω, digits=1)) * " ,γL:" * string(γL) * " ,γR:" *　string(γR) * " ,phase:" * string(phase) * " ,N:" * string(N) * "\n dt = " * string(end_time/time_steps) * " ,sim_num:" * string(num_of_simulations)
@@ -541,14 +543,14 @@ function plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase
     xlabel!("time")
     ylabel!("prob spin up")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_up_RK4_optimised3.png"
+    name = "Figures/spin_up_RK4_optimised4.png"
     savefig(name)
 
 end
 
-time_steps = 20000
+time_steps = 10000
 end_time = 8
-num_of_simulations = 1
+num_of_simulations = 10
 
 Ω = 10π
 γL = 0.5
