@@ -355,7 +355,7 @@ function plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase
     xlabel!("time")
     ylabel!("prob spin down")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_down4.png"
+    name = "Figures/spin_down5.png"
     savefig(name)
 
     attributes = "spin up," * " Γ:" * string(round(Ω, digits=1)) * " ,γL:" * string(γL) * " ,γR:" *　string(γR) * " ,phase:" * string(phase) * " ,N:" * string(N) * "\n dt = " * string(end_time/time_steps) * " ,sim_num:" * string(num_of_simulations)
@@ -364,19 +364,19 @@ function plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase
     xlabel!("time")
     ylabel!("prob spin up")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_up4.png"
+    name = "Figures/spin_up5.png"
     savefig(name)
 
 end
 
 time_steps = 80000
 end_time = 8
-num_of_simulations = 10
+num_of_simulations = 25
 
 Ω = 10π
 γL = 0.5
 γR = 0.5
-phase = π
+phase = 0
 N = 20
 
 @time time_list, avg_spin_down, avg_spin_up = average_simulation(N, phase, Ω, γL, γR, end_time, time_steps)

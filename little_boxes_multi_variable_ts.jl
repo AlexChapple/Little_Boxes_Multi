@@ -11,6 +11,7 @@ Edits:
 13/7/2021 - Initial Writing
 19/7/2021 - Adding RK (new file)
 20/7/2021 - Optimising the code heavily by reducing the number of things that need to be stored
+21/7/2021 - Optimising the code further by adding variable time steps 
 
 =#
 
@@ -46,7 +47,7 @@ function return_total(η_0_new, ξ_0_new, η_1_new, ξ_1_new, η_2_new, ξ_2_new
 end
 
 
-function evolve(time_list, Ω, γL, γR , dt, τ, phase, N)
+function evolve(time_list, Ω, γL, γR , dt_strong, τ_strong,  dt_weak, τ_weak, phase, N, l)
 
     #=
     Evolves one simulation from start to finish 
@@ -64,10 +65,18 @@ function evolve(time_list, Ω, γL, γR , dt, τ, phase, N)
     spin_up::Array{Float64} = zeros(size(time_list)[1])
     spin_down::Array{Float64} = zeros(size(time_list)[1])
 
-    λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/τ)
-    λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/τ)
-
     for index in 1:size(time_list)[1]
+
+        # Determine which values strong or weak to use
+        if index <= l
+            dt = dt_strong
+            λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/τ_strong)
+            λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/τ_strong)
+        else
+            dt = dt_weak
+            λL = exp(1im * phase / 2) * sqrt(γL) * sqrt(N/τ_weak)
+            λR = exp(-1im * phase / 2) * sqrt(γR) * sqrt(N/τ_weak)
+        end
 
         η_0_old::ComplexF64 = η_0
         ξ_0_old::ComplexF64 = ξ_0
@@ -495,19 +504,29 @@ function evolve(time_list, Ω, γL, γR , dt, τ, phase, N)
 
 end
 
-function average_simulation(N, phase, Ω, γL, γR, end_time, time_steps)
+function average_simulation(N, phase, Ω, γL, γR, end_time1, end_time2, time_steps_strong, time_steps_weak)
 
-    time_list = LinRange(0,end_time,time_steps)
-    dt = end_time/time_steps
-    Δt = 10 * dt
-    τ = Δt * N
+    time_list_strong = LinRange(0,end_time1,time_steps_strong)
+    dt_strong = end_time1/time_steps_strong
+    Δt_strong = 10 * dt_strong
+    τ_strong = Δt_strong * N
+    l = size(time_list_strong)[1]
+
+    time_list_weak = LinRange(end_time1, end_time2, time_steps_weak)
+    time_list_weak = time_list_weak[2:end]
+    dt_weak = (end_time2 - end_time1)/time_steps_weak
+    Δt_weak = 10 * dt_weak
+    τ_weak = Δt_weak * N
+
+    # Put the two time lists back together
+    time_list = vcat(time_list_strong, time_list_weak)
 
     avg_spin_up::Array{Float64} = zeros(size(time_list)[1])
     avg_spin_down::Array{Float64} = zeros(size(time_list)[1])
 
     for sim in 1:num_of_simulations
 
-        spin_down, spin_up = evolve(time_list, Ω, γL, γR, dt, τ, phase, N)
+        spin_down, spin_up = evolve(time_list, Ω, γL, γR, dt_strong, τ_strong, dt_strong, τ_weak, phase, N, l) # Here l is the length of timelist strong
 
         avg_spin_down += spin_down
         avg_spin_up += spin_up
@@ -524,30 +543,32 @@ function average_simulation(N, phase, Ω, γL, γR, end_time, time_steps)
 
 end
 
-function plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase, N, end_time, time_steps, num_of_simulations)
+function plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase, N, end_time1, time_steps_strong, end_time2, time_steps_weak,num_of_simulations)
 
-    attributes = "spin down," * " Ω:" * string(round(Ω, digits=1)) * " ,γL:" * string(γL) * " ,γR:" *　string(γR) * " ,phase:" * string(phase) * " ,N:" * string(N) * "\n dt = " * string(end_time/time_steps) * " ,sim_num:" * string(num_of_simulations)
+    attributes = "spin down," * " Ω:" * string(round(Ω, digits=1)) * " ,γL:" * string(γL) * " ,γR:" *　string(γR) * " ,phase:" * string(phase) * " ,N:" * string(N) * "\n dt = " * string(end_time1/time_steps_strong) * " dt = " * string((end_time2 - end_time1)/time_steps_weak) * " ,sim_num:" * string(num_of_simulations)
 
     plot(time_list, avg_spin_down, lw=2,label="spin down", dpi=600)
     xlabel!("time")
     ylabel!("prob spin down")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_down_RK4_optimised3.png"
+    name = "Figures/spin_down_var_ts.png"
     savefig(name)
 
-    attributes = "spin up," * " Ω:" * string(round(Ω, digits=1)) * " ,γL:" * string(γL) * " ,γR:" *　string(γR) * " ,phase:" * string(phase) * " ,N:" * string(N) * "\n dt = " * string(end_time/time_steps) * " ,sim_num:" * string(num_of_simulations)
+    attributes = "spin up," * " Ω:" * string(round(Ω, digits=1)) * " ,γL:" * string(γL) * " ,γR:" *　string(γR) * " ,phase:" * string(phase) * " ,N:" * string(N) * "\n dt = " * string(end_time1/time_steps_strong) * " dt = " * string((end_time2 - end_time1)/time_steps_weak) * " ,sim_num:" * string(num_of_simulations)
 
     plot(time_list, avg_spin_up, lw=2, label="spin up", dpi=600)
     xlabel!("time")
     ylabel!("prob spin up")
     title!(attributes, titlefont=10)
-    name = "Figures/spin_up_RK4_optimised3.png"
+    name = "Figures/spin_up_var_ts.png"
     savefig(name)
 
 end
 
-time_steps = 20000
-end_time = 8
+time_steps_strong = 3000
+time_steps_weak = 1000
+end_time1 = 3.5
+end_time2 = 8
 num_of_simulations = 1
 
 Ω = 10π
@@ -556,6 +577,6 @@ num_of_simulations = 1
 phase = 0
 N = 20
 
-@time time_list, avg_spin_down, avg_spin_up = average_simulation(N, phase, Ω, γL, γR, end_time, time_steps)
+@time time_list, avg_spin_down, avg_spin_up = average_simulation(N, phase, Ω, γL, γR, end_time1, end_time2, time_steps_strong, time_steps_weak)
 
-plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase, N, end_time, time_steps, num_of_simulations)
+plot_results(time_list, avg_spin_down, avg_spin_up, Ω, γL, γR, phase, N, end_time1, time_steps_strong, end_time2, time_steps_weak, num_of_simulations)
